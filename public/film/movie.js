@@ -1,3 +1,4 @@
+import {Adventure} from './game/adventure.js';
 /** A five-hour, real-time coded movie. No repeated five-minute video loop.
  * Uses original Mine Build Defeat world, villages, villagers, golems,
  * zombies, item artwork and weather. Camera, combat and story are directed.
@@ -16,6 +17,7 @@ const people=scene.children.filter(g=>g.userData.villager),golems=scene.children
 const cx=people.reduce((a,p)=>a+p.position.x,0)/people.length;
 const cz=people.reduce((a,p)=>a+p.position.z,0)/people.length;
 const floor=people[0].position.y-.5;
+const adventure=new Adventure(scene,{cinematic:true});
 const dayPositions=people.map(p=>p.position.clone());
 const homes=people.map((_,i)=>new THREE.Vector3(i<3?-10:10,floor+1.1,i%2?-10:10));
 const patrol=new THREE.CatmullRomCurve3([[0,-16],[0,-8],[4,-4],[4,4],[0,8],[0,16],[16,16],[16,-16],[0,-16],[-16,-16],[-16,16],[0,16]].map(([x,z])=>new THREE.Vector3(x,floor+2,z)),true,'centripetal');
@@ -58,9 +60,10 @@ function wave(t){const night=t>=10800&&t<16200;const w=Math.floor((t-10800)/48);
  });kills=Math.max(0,w*3+zombies.filter(z=>!z.group.visible).length);
 }
 function worldFrame(t,dt){
+ adventure.update(dt,camera.position);
  const chapter=chapterAt(t),index=CHAPTERS.indexOf(chapter),local=t-chapter.start;
  const sunset=smooth((t-7900)/2200),night=smooth((t-9400)/1400)*(1-smooth((t-16800)/1200));
- const sky=new THREE.Color('#87ceeb').lerp(new THREE.Color('#e06030'),t>16800?1-smooth((t-16800)/1200):sunset).lerp(new THREE.Color('#050510'),night);scene.background.copy(sky);scene.fog.color.copy(sky);scene.fog.density=night>.8?.065:.035;
+ const sky=new THREE.Color('#87ceeb').lerp(new THREE.Color('#e06030'),t>16800?1-smooth((t-16800)/1200):sunset).lerp(new THREE.Color('#050510'),night);scene.background.copy(sky);scene.fog.color.copy(sky);scene.fog.density=night>.8?.045:.014;
  ambient.intensity=1.4-night*1.0;sun.intensity=2*(1-night);moon.intensity=.6*night;
  const mode=night>.8&&t<16400?'storm':'clear';if(weather.weatherType!==mode)weather.setWeather(mode,scene);weather.update(dt,camera.position);
  if(t<9400)updateVillageResidents(dt,t,[]);
@@ -77,7 +80,20 @@ function worldFrame(t,dt){
  else{const path=patrol.getPointAt((t/180)%1);px=path.x;pz=path.z;
  const focus=people[shot%people.length];tx=focus.position.x;tz=focus.position.z;
  if(index>=2&&index<=8&&shot%3===0){tx=px+Math.sin(a)*14;tz=pz+Math.cos(a)*14;ty=floor+1.3;}}
- const desired=new THREE.Vector3(px,floor+2+Math.sin(t*7)*.018,pz);targetCamera.position.copy(desired);targetCamera.lookAt(tx,ty,tz);
+ let viewY=floor+2;
+ // Daytime expeditions depart and return along continuous, eased routes.
+ if(index>=2&&index<=8){
+  const stops=[[-25,-9],[-27,25],[22,-23],[24,0],[-27,25],[24,0],[-25,-9]];
+  const [sx,sz]=stops[index-2];const phase=local/900;
+  const travel=smooth(phase<.25?phase/.25:phase>.75?(1-phase)/.25:1);
+  const orbit=Math.sin(Math.max(0,phase-.25)*Math.PI*4)*2;
+  px=THREE.MathUtils.lerp(0,sx+orbit,travel);pz=THREE.MathUtils.lerp(-16,sz-7,travel);
+  if((index===5||index===7)&&phase>=.25&&phase<=.75){const angle=(phase-.25)*Math.PI*4;px=sx+Math.sin(angle)*8;pz=sz-Math.cos(angle)*7;}
+  tx=sx;tz=sz;ty=6;
+  let terrain=4;for(let y=28;y>=0;y--)if(world.blocks.has(`${Math.round(px)},${y},${Math.round(pz)}`)){terrain=y;break;}
+  viewY=Math.max(floor+2,terrain+2.2);
+ }
+ const desired=new THREE.Vector3(px,viewY+Math.sin(t*7)*.018,pz);targetCamera.position.copy(desired);targetCamera.lookAt(tx,ty,tz);
  if(snapCamera){camera.position.copy(desired);camera.quaternion.copy(targetCamera.quaternion);snapCamera=false;}
  else{camera.position.lerp(desired,1-Math.exp(-2.6*dt));camera.quaternion.slerp(targetCamera.quaternion,1-Math.exp(-2.2*dt));}
  const held=index>=2&&index<10?(index%2?'Stone':'Wood'):'';equip(held);state.selectedSlot=held==='Stone'?1:2;

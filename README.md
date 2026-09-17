@@ -3,13 +3,15 @@
 [Watch Survive the Night](https://riodebajyoti.github.io/mine-build-defeat-movie/)
 
 A five-hour first-person survival movie with five villagers, two guardians,
-smooth camera movement, zombie attacks, weather, music and sound effects.
+pixel-textured blocks, explorer quests, ruins, a crystal cavern, a farmstead,
+farm animals, smooth camera movement, zombie attacks, weather, music and sound effects.
 The story starts on the first morning and ends on the second morning at 05:00:00.
 There are 20 chapters; use the timeline to skip ahead or pause at any time.
 
 The movie is scripted and animated in the browser using the original game's
 world and models. It is not a recording of an unmodified five-hour play session.
-Recurring patrol and combat animations accompany the progressing story.
+Daytime expeditions visit four new landmarks; recurring patrol and combat
+animations accompany the progressing story.
 
 ## Develop and build
 
