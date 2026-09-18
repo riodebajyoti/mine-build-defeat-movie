@@ -101,19 +101,20 @@ function worldFrame(t,dt){
  hp=combat?Math.max(18,Math.round(96-(t-10800)/5400*73-8*Math.sin(t*.09)**8)):t>=16200?18:100;
  updateSound(night,t<17100,combat&&((t-10800)%48)>16&&((t-10800)%48)<35);
  renderer.render(scene,camera);ctx.drawImage(renderer.domElement,0,0,1280,720);
+ const vignette=ctx.createRadialGradient(640,340,260,640,340,820);vignette.addColorStop(0,'#03161300');vignette.addColorStop(1,'#03161380');ctx.fillStyle=vignette;ctx.fillRect(0,0,1280,720);
  if(combat){const g=ctx.createRadialGradient(640,360,240,640,360,760);g.addColorStop(0,'#80000000');g.addColorStop(1,`rgba(180,0,0,${(100-hp)/270})`);ctx.fillStyle=g;ctx.fillRect(0,0,1280,720);}
  // Faithful first-person HUD colors, inventory artwork and circular crosshair.
- say('HP',20,27,11,'#00f3ff');say('ENERGY',20,65,11,'#00f3ff');[[34,'#ff4d4d',hp],[72,'#4d94ff',100]].forEach(([y,c,v])=>{ctx.fillStyle='#ffffff15';ctx.fillRect(20,y,250,8);ctx.fillStyle=c;ctx.fillRect(20,y,250*v/100,8);});
+ say('HP',20,27,11,'#efd096');say('ENERGY',20,65,11,'#efd096');[[34,'#ff4d4d',hp],[72,'#4d94ff',100]].forEach(([y,c,v])=>{ctx.fillStyle='#ffffff15';ctx.fillRect(20,y,250,8);ctx.fillStyle=c;ctx.fillRect(20,y,250*v/100,8);});
  ctx.strokeStyle='#ffffffb0';ctx.lineWidth=2;ctx.beginPath();ctx.arc(640,360,5,0,Math.PI*2);ctx.stroke();
- panel(1020,20,240,30);say(night>.8?(mode==='storm'?'NIGHT / STORM':'NIGHT / CLEAR'):t>16800?'SECOND MORNING / CLEAR':sunset>.3?'SUNSET / CLEAR':'MORNING / CLEAR',1247,40,12,'#00f3ff','right');
- panel(490,616,300,68);['Dirt','Stone','Wood','Steel','Cores'].forEach((name,i)=>{const x=500+i*58;ctx.fillStyle='#0007';ctx.fillRect(x,626,48,48);ctx.strokeStyle=i===state.selectedSlot?'#00f3ff':'#777';ctx.strokeRect(x,626,48,48);ctx.imageSmoothingEnabled=false;ctx.drawImage(getItemCanvas(name),x+6,632,36,36);});ctx.imageSmoothingEnabled=true;
- panel(20,623,390,66);say(chapter.objective.toUpperCase(),33,649,14,'#00f3ff');say(clock(t)+' / 05:00:00',33,674,14,'#cad9e0');
- panel(918,594,342,105);say('♥',932,642,30,'#6bd69a');say(combat&&hp<35?'CRITICAL: KEEP MOVING':t>=16200?'VILLAGERS SAFE':'SURVIVAL MISSION',978,630,13,'#00f3ff');say(t>=16200?'The village is still standing.':combat?'Protect the villagers.':'Prepare before the storm.',978,657,13,'#dde5ed');
+ panel(1020,20,240,30);say(night>.8?(mode==='storm'?'NIGHT / STORM':'NIGHT / CLEAR'):t>16800?'SECOND MORNING / CLEAR':sunset>.3?'SUNSET / CLEAR':'MORNING / CLEAR',1247,40,12,'#efd096','right');
+ panel(490,616,300,68);['Dirt','Stone','Wood','Steel','Cores'].forEach((name,i)=>{const x=500+i*58;ctx.fillStyle='#0007';ctx.fillRect(x,626,48,48);ctx.strokeStyle=i===state.selectedSlot?'#efd096':'#777';ctx.strokeRect(x,626,48,48);ctx.imageSmoothingEnabled=false;ctx.drawImage(getItemCanvas(name),x+6,632,36,36);});ctx.imageSmoothingEnabled=true;
+ panel(20,623,390,66);say(chapter.objective.toUpperCase(),33,649,14,'#efd096');say(clock(t)+' / 05:00:00',33,674,14,'#cad9e0');
+ panel(918,594,342,105);say('♥',932,642,30,'#6bd69a');say(combat&&hp<35?'CRITICAL: KEEP MOVING':t>=16200?'VILLAGERS SAFE':'SURVIVAL MISSION',978,630,13,'#efd096');say(t>=16200?'The village is still standing.':combat?'Protect the villagers.':'Prepare before the storm.',978,657,13,'#dde5ed');
  // Story beats occupy short intervals, leaving most of the view clear.
  const beat=Math.floor(local/90),beatAge=local%90;
  if(beatAge<12){const lines=[chapter.line,chapter.objective+'. Keep the village close.',combat?'The storm cannot last forever. Keep moving.':'Every supply we gather gives us another chance.',combat?'Listen. There is another one out there.':'We will be ready when the light is gone.'];const line=lines[beat%lines.length];panel(240,524,800,55);say(`${chapter.speaker}: ${line}`,640,558,18,'#fff','center');}
- if(local<9){ctx.globalAlpha=Math.min(1,local/1.5,Math.max(0,(9-local)/2));panel(320,210,640,180);say(`CHAPTER ${String(index+1).padStart(2,'0')} / 20`,640,256,14,'#00f3ff','center');say(chapter.title.toUpperCase(),640,317,38,'#fff','center');say(chapter.objective,640,357,18,'#becbd6','center');ctx.globalAlpha=1;}
- if(t>17935){const alpha=clamp((t-17935)/8);ctx.globalAlpha=alpha;panel(260,180,760,300);say('NIGHT SURVIVED',640,250,48,'#00f3ff','center');say('Second morning. Five villagers safe.',640,305,24,'#fff','center');say('MINE BUILD DEFEAT',640,365,20,'#c4d7e2','center');say('Original game by riodebajyoti',640,402,16,'#c4d7e2','center');say('A scripted, procedurally animated survival movie',640,440,15,'#95a7b3','center');ctx.globalAlpha=1;}
+ if(local<9){ctx.globalAlpha=Math.min(1,local/1.5,Math.max(0,(9-local)/2));panel(320,210,640,180);say(`CHAPTER ${String(index+1).padStart(2,'0')} / 20`,640,256,14,'#efd096','center');say(chapter.title.toUpperCase(),640,317,38,'#fff','center');say(chapter.objective,640,357,18,'#becbd6','center');ctx.globalAlpha=1;}
+ if(t>17935){const alpha=clamp((t-17935)/8);ctx.globalAlpha=alpha;panel(260,180,760,300);say('NIGHT SURVIVED',640,250,48,'#efd096','center');say('Second morning. Five villagers safe.',640,305,24,'#fff','center');say('MINE BUILD DEFEAT',640,365,20,'#c4d7e2','center');say('Original game by riodebajyoti',640,402,16,'#c4d7e2','center');say('A scripted, procedurally animated survival movie',640,440,15,'#95a7b3','center');ctx.globalAlpha=1;}
  return {time:t,duration:DURATION,chapter:index,hp,villagers:people.length,night:night>.8,playing,muted,volume};
 }
 function notify(){parent.postMessage({type:'movie-state',time,duration:DURATION,playing,muted,volume,chapter:Math.min(19,Math.floor(time/900))},location.origin);}
